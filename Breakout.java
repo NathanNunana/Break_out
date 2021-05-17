@@ -59,6 +59,70 @@ public class Breakout extends GraphicsProgram {
 /** Runs the Breakout program. */
 	public void run() {
 		/* You fill this in, along with any subsidiary methods */
+		setUpBricks();
+		createPaddle();
 	}
-
+	
+	private void setUpBricks() {
+		for(int i =0; i < NBRICK_ROWS;i++) {
+			for(int j = 0; j<NBRICKS_PER_ROW;j++) {
+				rect = new GRect(BRICK_WIDTH, BRICK_HEIGHT);
+				int center = (APPLICATION_WIDTH - ((BRICK_WIDTH) * NBRICKS_PER_ROW))/2;
+				int x = center + (BRICK_WIDTH +  BRICK_SEP) * j;
+				int y = BRICK_Y_OFFSET + (BRICK_HEIGHT +  BRICK_SEP)*i;
+				rect.setLocation(x, y);
+				rect.setFilled(true);
+				setRainbowColors(i, rect);
+				add(rect);
+			}
+		}
+	}
+	
+	private void setRainbowColors(int index, GRect rect) {
+		if (index == 0 || index == 1) {
+			rect.setColor(Color.RED);
+			rect.setColor(Color.RED);
+		}else if (index == 2 || index == 3) {
+			rect.setColor(Color.ORANGE);
+			rect.setColor(Color.ORANGE);
+		}else if (index == 4 || index == 5) {
+			rect.setColor(Color.YELLOW);
+			rect.setColor(Color.YELLOW);
+		}else if (index == 6 || index == 7) {
+			rect.setColor(Color.GREEN);
+			rect.setColor(Color.GREEN);
+		}else if (index == 8 || index == 9) {
+			rect.setColor(Color.CYAN);
+			rect.setColor(Color.CYAN);
+		}
+		
+	}
+	
+	private void createPaddle() {
+		rect = new GRect(PADDLE_WIDTH,PADDLE_HEIGHT);
+		int bottom = HEIGHT - PADDLE_Y_OFFSET;
+		int center = (WIDTH - PADDLE_WIDTH)/2;
+		rect.setLocation(center, bottom);
+		rect.setFilled(true);
+		add(rect);
+		addMouseMotionListener(this);
+	}
+	
+	/*This part is where I am struggling with*/
+	public void mouseMoved(MouseEvent e) {
+		while(true) {
+			rect.move(e.getX(), HEIGHT - PADDLE_Y_OFFSET);
+		}
+	}
+	
+	private void createBall() {
+		int diameter = BALL_RADIUS * 2; 
+		GOval ball = new GOval(diameter, diameter);
+		ball.setFilled(true);
+	}
+	
+	
+	private GObject obj;
+	private GRect rect; 
+	RandomGenerator rgen = RandomGenerator.getInstance();
 }
