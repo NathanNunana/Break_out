@@ -14,7 +14,7 @@ import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Breakout extends GraphicsProgram {
+public class Breakout extends GraphicsProgram implements MouseMotionListener{
 
 /** Width and height of application window in pixels */
 	public static final int APPLICATION_WIDTH = 400;
@@ -59,16 +59,21 @@ public class Breakout extends GraphicsProgram {
 /** Runs the Breakout program. */
 	public void run() {
 		/* You fill this in, along with any subsidiary methods */
+		setSize(WIDTH, HEIGHT);
 		setUpBricks();
 		createPaddle();
+		createBall();
+		waitForClick();
+		moveBall();
+		addMouseMotionListener(this);
 	}
 	
 	private void setUpBricks() {
 		for(int i =0; i < NBRICK_ROWS;i++) {
 			for(int j = 0; j<NBRICKS_PER_ROW;j++) {
-				rect = new GRect(BRICK_WIDTH, BRICK_HEIGHT);
-				int center = (APPLICATION_WIDTH - ((BRICK_WIDTH) * NBRICKS_PER_ROW))/2;
-				int x = center + (BRICK_WIDTH +  BRICK_SEP) * j;
+				GRect rect = new GRect(BRICK_WIDTH, BRICK_HEIGHT);
+//				int center = (APPLICATION_WIDTH - ((BRICK_WIDTH) * NBRICKS_PER_ROW))/2;
+				int x = BRICK_SEP + (BRICK_WIDTH +  BRICK_SEP) * j;
 				int y = BRICK_Y_OFFSET + (BRICK_HEIGHT +  BRICK_SEP)*i;
 				rect.setLocation(x, y);
 				rect.setFilled(true);
@@ -105,24 +110,48 @@ public class Breakout extends GraphicsProgram {
 		rect.setLocation(center, bottom);
 		rect.setFilled(true);
 		add(rect);
-		addMouseMotionListener(this);
 	}
 	
 	/*This part is where I am struggling with*/
 	public void mouseMoved(MouseEvent e) {
-		while(true) {
-			rect.move(e.getX(), HEIGHT - PADDLE_Y_OFFSET);
-		}
+//		println(e.getX());
+		rect.setX(e.getX());
 	}
 	
 	private void createBall() {
-		int diameter = BALL_RADIUS * 2; 
-		GOval ball = new GOval(diameter, diameter);
+		ball = new GOval(diameter, diameter);
 		ball.setFilled(true);
+		ball.setLocation((WIDTH - diameter)/2, (HEIGHT - diameter)/2);
+		add(ball);
+	}
+	
+	private void moveBall() {
+		while(true) { 
+			vx += rgen.nextDouble(1.0, 3.0);
+//			if(rgen.nextBoolean(.5)) vx = -vx;
+			vy += 3.0;
+			checkCollision();
+			ball.move(vx, vy);
+			pause(100);
+		}
+	}
+	private void checkCollision(){
+		if(ball.getX() == ball.getY()) {
+			vx = -vx;
+			vy = -vy;
+		}else if(ball.getBottomY() >= (double)APPLICATION_HEIGHT || ball.getY() <= 0.0 ) {
+			vy = -vy;
+			println("vy = " + vy);
+		}else if(ball.getRightX() >= (double)APPLICATION_WIDTH || ball.getX() <= 0.0) {
+			vx = -vx;
+			println("vx =" + vx);
+		}
 	}
 	
 	
-	private GObject obj;
+	private int diameter = BALL_RADIUS * 2;
+	private double vx, vy;
+	private GOval ball;
 	private GRect rect; 
 	RandomGenerator rgen = RandomGenerator.getInstance();
 }
